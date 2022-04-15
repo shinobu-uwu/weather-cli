@@ -24,15 +24,20 @@ async fn main() {
         toggle_units(&mut config).unwrap();
     }
 
-    get_weather(config).await;
+    get_weather(args, config).await;
 }
 
-async fn get_weather(config: Config) {
+async fn get_weather(args: Cli, config: Config) {
+    let location = match args.location {
+        Some(location) => location,
+        None => config.location
+    };
+
     let client = Client::new();
 
     let response = client
         .get(BASE_URL)
-        .query(&[("q", &config.location)])
+        .query(&[("q", location)])
         .query(&[("appid", &config.api_key)])
         .query(&[("units", &config.units)])
         .send()
